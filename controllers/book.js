@@ -108,3 +108,30 @@ exports.deleteBook = (req, res, next) => {
             res.status(500).json({ error });
         });
 };
+
+exports.postBookRating = (req, res, next) => {
+    Book.findOne({ _id: req.params.id })
+        .then((book) => {
+            if (
+                book.ratings.some((rating) => rating.userId === req.auth.userId)
+            ) {
+                return res.status(403).json({
+                    message:
+                        'Impossible de donner plusieurs notes à un livre à partir du même utilisateur',
+                });
+            }
+            const newRating = {
+                userId: req.body.userId,
+                grade: req.body.rating,
+            };
+            const updatedRatings = [...book.ratings, newRating];
+            Book.updateOne({ _id: req.params.id }, { ratings: updatedRatings })
+                .then(() => {
+                    res.status(201).json({
+                        message: 'Note enregistrée avec succès',
+                    });
+                })
+                .catch((error) => res.status(401).json({ error }));
+        })
+        .catch();
+};

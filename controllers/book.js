@@ -143,24 +143,41 @@ exports.postBookRating = (req, res, next) => {
                             res.status(201).json(book);
                         })
                         .catch((error) =>
-                            res
-                                .status(401)
-                                .json({
-                                    message:
-                                        'Erreur lors de récupération du livre modifié',
-                                    error: error,
-                                })
+                            res.status(401).json({
+                                message:
+                                    'Erreur lors de récupération du livre modifié',
+                                error: error,
+                            })
                         );
                 })
                 .catch((error) =>
-                    res
-                        .status(401)
-                        .json({
-                            message:
-                                'Erreur lors de la mise à jour des notes du livre',
-                            error: error,
-                        })
+                    res.status(401).json({
+                        message:
+                            'Erreur lors de la mise à jour des notes du livre',
+                        error: error,
+                    })
                 );
         })
-        .catch();
+        .catch((error) =>
+            res.status(401).json({
+                message: 'Erreur lors de la récupération du livre à modifier',
+                error: error,
+            })
+        );
+};
+
+exports.getBestRatedBooks = (req, res, next) => {
+    Book.find()
+        .then((books) => {
+            const threeBestBooks = books
+                .sort((a, b) => b.averageRating - a.averageRating)
+                .slice(0, 3);
+            res.status(200).json(threeBestBooks);
+        })
+        .catch((error) =>
+            res.status(400).json({
+                message: 'Erreur lors de la récupération des livres',
+                error: error,
+            })
+        );
 };

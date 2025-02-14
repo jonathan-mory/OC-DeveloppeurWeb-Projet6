@@ -125,13 +125,42 @@ exports.postBookRating = (req, res, next) => {
                 grade: req.body.rating,
             };
             const updatedRatings = [...book.ratings, newRating];
-            Book.updateOne({ _id: req.params.id }, { ratings: updatedRatings })
+            const sumOfUpdatedRatings = updatedRatings
+                .map((rating) => rating.grade)
+                .reduce(
+                    (accumulator, currentValue) => accumulator + currentValue,
+                    0
+                );
+            const newAverageRating =
+                sumOfUpdatedRatings / updatedRatings.length;
+            Book.updateOne(
+                { _id: req.params.id },
+                { ratings: updatedRatings, averageRating: newAverageRating }
+            )
                 .then(() => {
-                    res.status(201).json({
-                        message: 'Note enregistrée avec succès',
-                    });
+                    Book.findById(req.params.id)
+                        .then((book) => {
+                            res.status(201).json(book);
+                        })
+                        .catch((error) =>
+                            res
+                                .status(401)
+                                .json({
+                                    message:
+                                        'Erreur lors de récupération du livre modifié',
+                                    error: error,
+                                })
+                        );
                 })
-                .catch((error) => res.status(401).json({ error }));
+                .catch((error) =>
+                    res
+                        .status(401)
+                        .json({
+                            message:
+                                'Erreur lors de la mise à jour des notes du livre',
+                            error: error,
+                        })
+                );
         })
         .catch();
 };

@@ -133,9 +133,11 @@ exports.postBookRating = (req, res, next) => {
                 );
             const newAverageRating =
                 sumOfUpdatedRatings / updatedRatings.length;
+            const roundedAverageRating =
+                Math.round(newAverageRating * 100) / 100;
             Book.updateOne(
                 { _id: req.params.id },
-                { ratings: updatedRatings, averageRating: newAverageRating }
+                { ratings: updatedRatings, averageRating: roundedAverageRating }
             )
                 .then(() => {
                     Book.findById(req.params.id)

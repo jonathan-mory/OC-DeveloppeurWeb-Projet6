@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -6,8 +7,9 @@ const bookRoutes = require('./routes/books');
 const authRoutes = require('./routes/auth');
 
 const app = express();
-const uri =
-    'mongodb+srv://jomory:UhQvdnz7M8O1R9LA@openclassrooms.elow0.mongodb.net/mon_vieux_grimoire?retryWrites=true&w=majority&appName=OpenClassrooms';
+
+const uri = process.env.MONGO_URI;
+
 mongoose
     .connect(uri)
     .then(() => console.log('Connexion à MongoDB réussie !'))

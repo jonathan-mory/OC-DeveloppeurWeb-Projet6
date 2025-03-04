@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: ['.env.local', '.env'] });
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -33,5 +33,9 @@ app.use((req, res, next) => {
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/books', bookRoutes);
 app.use('/api/auth', authRoutes);
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Erreur serveur');
+});
 
 module.exports = app;

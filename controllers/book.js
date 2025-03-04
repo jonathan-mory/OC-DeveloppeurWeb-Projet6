@@ -146,7 +146,6 @@ exports.postBookRating = async (req, res, next) => {
         );
         const newAverageRating = sumOfUpdatedRatings / updatedRatings.length;
         const roundedAverageRating = Math.round(newAverageRating * 100) / 100;
-
         await Book.updateOne(
             { _id: req.params.id },
             { ratings: updatedRatings, averageRating: roundedAverageRating }

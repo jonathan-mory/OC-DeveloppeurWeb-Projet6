@@ -1,10 +1,17 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const { validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const { default: mongoose } = require('mongoose');
 
 exports.signup = async (req, res, next) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                errors: errors.array(),
+            });
+        }
         const hash = await bcrypt.hash(req.body.password, 10);
         const user = new User({
             email: req.body.email,

@@ -2,6 +2,7 @@ const { default: mongoose } = require('mongoose');
 const Book = require('../models/Book');
 const path = require('path');
 const fs = require('fs');
+const { validationResult } = require('express-validator');
 
 exports.getAllBooks = async (req, res, next) => {
     try {
@@ -31,6 +32,10 @@ exports.getOneBook = async (req, res, next) => {
 };
 
 exports.postBook = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
         const bookObject = JSON.parse(req.body.book);
         delete bookObject._id;
@@ -47,6 +52,12 @@ exports.postBook = async (req, res, next) => {
             message: 'Livre enregistré avec succès dans la base de données',
         });
     } catch (error) {
+        if (error instanceof mongoose.Error.ValidationError) {
+            return res.status(400).json({
+                message:
+                    'La note du livre envoyée en base de données doit être compris entre 0 et 5 ',
+            });
+        }
         res.status(500).json({
             message:
                 "Erreur serveur lors de l'enregistrement du livre dans la base de données",
@@ -127,6 +138,10 @@ exports.deleteBook = async (req, res, next) => {
 };
 
 exports.postBookRating = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
         const book = await Book.findById(req.params.id);
         if (book.ratings.some((rating) => rating.userId === req.auth.userId)) {
@@ -136,7 +151,7 @@ exports.postBookRating = async (req, res, next) => {
             });
         }
         const newRating = {
-            userId: req.body.userId,
+            userId: req.auth.userId,
             grade: req.body.rating,
         };
         const updatedRatings = [...book.ratings, newRating];

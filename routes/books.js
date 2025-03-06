@@ -10,6 +10,7 @@ const {
     validateBookRating,
     validateBookCreation,
 } = require('../middlewares/validators');
+const deleteImageonError = require('../middlewares/deleteImageonError');
 
 router.get('/', bookCtrl.getAllBooks);
 router.get('/bestrating', bookCtrl.getBestRatedBooks);

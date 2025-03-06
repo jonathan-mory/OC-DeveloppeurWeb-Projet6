@@ -5,6 +5,7 @@ module.exports = (req, res, next) => {
     if (!req.file) {
         return next();
     }
+
     const { buffer, originalname } = req.file;
     const fileName = originalname
         .split(' ')
@@ -12,6 +13,8 @@ module.exports = (req, res, next) => {
         .replace(/\.[^/.]+$/, '');
     const timeStamp = Date.now();
     const outputFileName = `${timeStamp}_${fileName}.webp`;
+    const filePath = path.join(__dirname, '..', 'images', outputFileName);
+
     sharp(buffer)
         .resize({
             width: 405,
@@ -20,7 +23,7 @@ module.exports = (req, res, next) => {
             withoutEnlargement: true,
         })
         .webp({ quality: 50 })
-        .toFile(path.join(__dirname, '..', 'images', outputFileName), (err) => {
+        .toFile(filePath, (err) => {
             if (err) {
                 return res.status(500).json({
                     message: "Erreur lors de l'optimisation de l'image",
@@ -28,6 +31,7 @@ module.exports = (req, res, next) => {
                 });
             }
             req.sharpFileName = outputFileName;
+            req.sharpFilePath = filePath;
             next();
         });
 };

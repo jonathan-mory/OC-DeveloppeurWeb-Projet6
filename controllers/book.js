@@ -34,10 +34,6 @@ exports.getOneBook = async (req, res, next) => {
 exports.postBook = async (req, res, next) => {
     try {
         const bookObject = JSON.parse(req.body.book);
-        const errors = validationResult(bookObject);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
         delete bookObject._id;
         delete bookObject._userId;
         const book = new Book({

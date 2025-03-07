@@ -51,7 +51,7 @@ exports.postBook = async (req, res, next) => {
         if (error instanceof mongoose.Error.ValidationError) {
             return res.status(400).json({
                 message:
-                    'La note du livre envoyée en base de données doit être compris entre 0 et 5 ',
+                    'Les données envoyées ne respectent pas les règles de validation de la base de données',
             });
         }
         res.status(500).json({

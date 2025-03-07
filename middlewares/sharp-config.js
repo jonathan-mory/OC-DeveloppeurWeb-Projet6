@@ -5,7 +5,6 @@ module.exports = (req, res, next) => {
     if (!req.file) {
         return next();
     }
-
     const { buffer, originalname } = req.file;
     const fileName = originalname
         .split(' ')
